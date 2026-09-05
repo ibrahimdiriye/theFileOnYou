@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The File On You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0F11;
+  --surface:#17191C;
+  --surface-2:#1E2124;
+  --surface-hi:#25282C;
+  --line:#2B2E33;
+  --text:#E7E5E2;
+  --muted:#8A8D93;
+  --dim:#5B5E64;
+  --accent:#7C8CFF;
+  --accent-dim:#4A4F8A;
+  --warn:#E8A33D;
+  --danger:#E85D5D;
+  --ok:#5FBF8F;
+  --radius-lg:28px;
+  --radius-md:18px;
+  --radius-sm:10px;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-data:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--accent);color:#0E0F11;}
+a{color:var(--accent);}
+
+.noise{
+  position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.025;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+header.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:8vh 8vw 6vh;
+  border-bottom:1px solid var(--line);
+  overflow:hidden;
+}
+.hero-glow{
+  position:absolute;
+  top:-20%;right:-10%;
+  width:60vw;height:60vw;
+  background:radial-gradient(circle,rgba(124,140,255,0.14) 0%,rgba(124,140,255,0) 70%);
+  pointer-events:none;
+}
+.eyebrow-line{
+  font-family:var(--font-data);
+  font-size:13px;
+  color:var(--muted);
+  letter-spacing:0.02em;
+  margin-bottom:28px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.pulse-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--danger);
+  animation:pulse 1.8s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(232,93,93,0.6);}
+  50%{box-shadow:0 0 0 8px rgba(232,93,93,0);}
+}
+h1.title{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:clamp(40px,7vw,88px);
+  line-height:0.98;
+  letter-spacing:-0.02em;
+  max-width:14ch;
+}
+h1.title .you{
+  color:var(--accent);
+}
+.hero-sub{
+  margin-top:32px;
+  font-size:clamp(17px,2vw,21px);
+  color:var(--muted);
+  max-width:56ch;
+  line-height:1.6;
+}
+.hero-meta{
+  margin-top:56px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+}
+.meta-chip{
+  font-family:var(--font-data);
+  font-size:13px;
+  padding:10px 16px;
+  border-radius:100px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.meta-chip .k{color:var(--dim);}
+.scroll-cue{
+  position:absolute;
+  bottom:6vh;left:8vw;
+  font-family:var(--font-data);
+  font-size:12px;
+  color:var(--dim);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.scroll-cue .arrow{
+  width:1px;height:34px;
+  background:linear-gradient(var(--dim),transparent);
+  position:relative;
+}
+
+.dossier-shell{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  max-width:1400px;
+  margin:0 auto;
+  padding:0 4vw;
+  gap:0;
+}
+.rail{
+  position:sticky;
+  top:0;
+  align-self:start;
+  padding:64px 0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.score-block{
+  padding:24px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+}
+.score-label{
+  font-family:var(--font-data);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--dim);
+  margin-bottom:10px;
+}
+.score-number{
+  font-family:var(--font-display);
+  font-size:56px;
+  font-weight:600;
+  color:var(--accent);
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.score-of{
+  font-family:var(--font-data);
+  font-size:14px;
+  color:var(--dim);
+  margin-top:4px;
+}
+.score-bar{
+  margin-top:16px;
+  height:6px;
+  border-radius:3px;
+  background:var(--surface-hi);
+  overflow:hidden;
+}
+.score-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--warn));
+  border-radius:3px;
+  transition:width 0.6s cubic-bezier(0.2,0.8,0.2,1);
+}
+.rail-nav{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  margin-top:24px;
+}
+.rail-nav a{
+  font-family:var(--font-data);
+  font-size:13px;
+  color:var(--muted);
+  text-decoration:none;
+  padding:9px 12px;
+  border-radius:var(--radius-sm);
+  border-left:2px solid transparent;
+  transition:background 0.15s,color 0.15s,border-color 0.15s;
+}
+.rail-nav a:hover{
+  background:var(--surface);
+  color:var(--text);
+}
+.rail-nav a.active{
+  color:var(--accent);
+  border-left-color:var(--accent);
+  background:var(--surface);
+}
+.rail-foot{
+  font-family:var(--font-data);
+  font-size:11px;
+  color:var(--dim);
+  line-height:1.7;
+}
+
+main{
+  padding:64px 0 160px;
+}
+section.category{
+  margin-bottom:96px;
+  scroll-margin-top:32px;
+}
+.category-head{
+  display:flex;
+  align-items:baseline;
+  gap:16px;
+  margin-bottom:8px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--line);
+}
+.category-num{
+  font-family:var(--font-data);
+  font-size:14px;
+  color:var(--dim);
+}
+.category-title{
+  font-family:var(--font-display);
+  font-size:clamp(26px,3vw,36px);
+  font-weight:600;
+  letter-spacing:-0.01em;
+}
+.category-count{
+  margin-left:auto;
+  font-family:var(--font-data);
+  font-size:13px;
+  color:var(--muted);
+  background:var(--surface);
+  padding:5px 12px;
+  border-radius:100px;
+  border:1px solid var(--line);
+}
+.category-desc{
+  color:var(--muted);
+  font-size:16px;
+  max-width:70ch;
+  margin:20px 0 32px;
+}
+
+.tile-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:14px;
+}
+.tile{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  padding:22px;
+  position:relative;
+  overflow:hidden;
+  transition:border-color 0.4s,background 0.4s,transform 0.3s;
+  opacity:0;
+  transform:translateY(10px);
+}
+.tile.revealed{
+  opacity:1;
+  transform:translateY(0);
+}
+.tile.revealed.hot{
+  border-color:var(--danger);
+  background:var(--surface-2);
+}
+.tile-label{
+  font-family:var(--font-data);
+  font-size:12px;
+  color:var(--dim);
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.sensitivity{
+  display:flex;
+  gap:3px;
+}
+.sensitivity span{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--line);
+}
+.sensitivity span.on{background:var(--warn);}
+.sensitivity.high span.on{background:var(--danger);}
+.tile-value{
+  font-family:var(--font-data);
+  font-size:15px;
+  color:var(--text);
+  word-break:break-word;
+  line-height:1.5;
+  min-height:1.5em;
+}
+.tile-value.scanning{
+  color:var(--dim);
+}
+.tile-value.scanning::after{
+  content:'';
+  display:inline-block;
+  width:6px;height:6px;
+  background:var(--dim);
+  border-radius:50%;
+  margin-left:6px;
+  animation:blink 1s step-start infinite;
+}
+@keyframes blink{50%{opacity:0;}}
+.tile-note{
+  margin-top:10px;
+  font-size:12.5px;
+  color:var(--muted);
+  line-height:1.5;
+}
+.tile canvas{
+  margin-top:10px;
+  border-radius:var(--radius-sm);
+  max-width:100%;
+  border:1px solid var(--line);
+}
+
+.tile-value.big{
+  font-family:var(--font-display);
+  font-size:20px;
+  font-weight:600;
+}
+
+.map-tile{
+  grid-column:span 2;
+}
+@media(max-width:640px){.map-tile{grid-column:span 1;}}
+.map-visual{
+  margin-top:12px;
+  height:160px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--line);
+  background:var(--surface-hi);
+  position:relative;
+  overflow:hidden;
+}
+.map-visual svg{width:100%;height:100%;}
+.map-pin{
+  position:absolute;
+  width:10px;height:10px;
+  background:var(--danger);
+  border-radius:50%;
+  box-shadow:0 0 0 4px rgba(232,93,93,0.25);
+  transform:translate(-50%,-50%);
+}
+
+.closing{
+  max-width:900px;
+  margin:0 auto;
+  padding:120px 8vw 140px;
+  border-top:1px solid var(--line);
+}
+.closing h2{
+  font-family:var(--font-display);
+  font-size:clamp(30px,4vw,48px);
+  font-weight:600;
+  letter-spacing:-0.01em;
+  margin-bottom:24px;
+  max-width:16ch;
+}
+.closing p{
+  color:var(--muted);
+  font-size:17px;
+  max-width:64ch;
+  margin-bottom:18px;
+  line-height:1.7;
+}
+.closing .sign{
+  margin-top:40px;
+  font-family:var(--font-data);
+  font-size:13px;
+  color:var(--dim);
+}
+
+.footer-bar{
+  border-top:1px solid var(--line);
+  padding:32px 8vw;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  font-family:var(--font-data);
+  font-size:12px;
+  color:var(--dim);
+}
+
+@media(max-width:640px){
+  header.hero{padding:10vh 6vw 8vh;}
+  .closing{padding:80px 6vw 100px;}
+  main{padding:40px 0 100px;}
+}
+
+@media (max-width:900px){
+  .dossier-shell{grid-template-columns:1fr;}
+  .rail{
+    position:static !important;
+    order:-1;
+    height:auto;
+    display:block;
+    padding:32px 0;
+  }
+  .score-block{margin-bottom:20px;}
+  .rail-nav{
+    flex-direction:row;
+    flex-wrap:wrap;
+    margin-top:0;
+  }
+  .rail-nav a{
+    border-left:none;
+    border:1px solid var(--line);
+  }
+  .rail-nav a.active{
+    border-color:var(--accent);
+  }
+  .rail-foot{display:none;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important;}
+}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="eyebrow-line">
+    <span class="pulse-dot"></span>
+    <span>COLLECTION STARTED THE MOMENT THIS PAGE LOADED &mdash; NO CLICKS, NO PERMISSIONS, NO CONSENT DIALOG</span>
+  </div>
+  <h1 class="title">The file<br>already open<br>on <span class="you">you</span>.</h1>
+  <p class="hero-sub">Everything below was gathered in the time it took this page to render. Nothing was requested. Nothing was allowed. This is the ambient exhaust of visiting a single website with a default browser.</p>
+  <div class="hero-meta" id="heroMeta"></div>
+</header>
+
+<div class="dossier-shell">
+  <aside class="rail">
+    <div>
+      <div class="score-block">
+        <div class="score-label">Data points collected</div>
+        <div class="score-number" id="scoreNumber">0</div>
+        <div class="score-of">of <span id="scoreTotal">&mdash;</span> tracked signals</div>
+        <div class="score-bar"><div class="score-fill" id="scoreFill"></div></div>
+      </div>
+      <nav class="rail-nav" id="railNav"></nav>
+    </div>
+    <div class="rail-foot">Everything on this page runs client-side.<br>Nothing shown here is transmitted anywhere.</div>
+  </aside>
+
+  <main id="main"></main>
+</div>
+
+<section class="closing">
+  <h2>None of this required a single permission prompt.</h2>
+  <p>Geolocation, camera, microphone, notifications &mdash; all of that sits behind a browser dialog you can decline. Everything cataloged above sits in front of it. It's handed over passively, by design, as the normal cost of loading a webpage, through headers, JavaScript APIs that were never gated, and the simple fact that rendering text and shapes on your specific screen requires revealing something true about the machine doing the rendering.</p>
+  <p>Individually, most of these signals feel harmless. A screen resolution. A timezone. A list of fonts. Combined, they narrow you down &mdash; and cross-site trackers have been combining them for two decades. This is the same technique behind most fingerprinting scripts running quietly on ordinary websites right now.</p>
+  <p>You didn't click allow. You didn't need to.</p>
+  <div class="sign">BUILT AS A DEMONSTRATION &middot; NOTHING ON THIS PAGE IS STORED, LOGGED, OR SENT ANYWHERE &middot; VIEW SOURCE TO VERIFY</div>
+</section>
+
+<div class="footer-bar">
+  <span>THE FILE ON YOU</span>
+  <span id="footerTime"></span>
+</div>
+
+<script>
+(function(){
+
+var CATS = [];
+var TOTAL = 0;
+var COLLECTED = 0;
+
+function cat(id, num, title, desc){
+  var c = {id:id, num:num, title:title, desc:desc, tiles:[]};
+  CATS.push(c);
+  return c;
+}
+
+function tile(c, opts){
+  opts.id = c.id + '-' + c.tiles.length;
+  c.tiles.push(opts);
+  TOTAL++;
+  return opts;
+}
+
+function esc(s){
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function fmtList(arr){
+  if (!arr || !arr.length) return 'none detected';
+  return arr.join(', ');
+}
+
+var network = cat('network', '01', 'Network & Location', 'What your connection reveals before a single byte of the page body has been parsed.');
+var device = cat('device', '02', 'Device & Hardware', 'Signals exposed by the physical machine rendering this page, no permission dialog involved.');
+var software = cat('software', '03', 'Browser & Software', 'The exact software stack, down to build quirks that differ between installs.');
+var render = cat('render', '04', 'Rendering Fingerprint', 'How your specific GPU, font rasterizer, and audio stack draw and process things, turned into an identifier.');
+var behavior = cat('behavior', '05', 'Behavioral & Session', 'What you\'ve done since arriving, measured without you noticing.');
+var inferred = cat('inferred', '06', 'Inferred About You', 'Nothing here was stated. All of it was derived.');
+
+tile(network, {label:'Public IP address', key:'ip', sensitivity:3, note:'Every server you talk to sees this by definition of how the internet routes packets.'});
+tile(network, {label:'Approximate geolocation', key:'geoip', sensitivity:3, big:true, note:'Derived from IP allocation records, not GPS. No location permission was requested.'});
+tile(network, {label:'ISP / network operator', key:'isp', sensitivity:2, note:'Which company owns the IP block you\'re routed through.'});
+tile(network, {label:'Effective bandwidth tier', key:'connType', sensitivity:1, note:'A throughput bucket the browser estimates, not your actual radio (5G/4G/WiFi). "4g" is the top tier the API reports, so fast WiFi and 5G both show as "4g" too.'});
+tile(network, {label:'Effective bandwidth estimate', key:'downlink', sensitivity:1});
+tile(network, {label:'Round-trip latency estimate', key:'rtt', sensitivity:1});
+tile(network, {label:'Data saver mode', key:'saveData', sensitivity:1});
+tile(network, {label:'Page referrer', key:'referrer', sensitivity:2, note:'The page you clicked from to get here, if any.'});
+tile(network, {label:'Connection security', key:'protocol', sensitivity:1});
+tile(network, {label:'Map of your approximate location', key:'map', sensitivity:3, isMap:true});
+
+tile(device, {label:'Screen resolution', key:'screenRes', sensitivity:1});
+tile(device, {label:'Available screen space', key:'availRes', sensitivity:1});
+tile(device, {label:'Color depth', key:'colorDepth', sensitivity:1});
+tile(device, {label:'Pixel density (DPR)', key:'dpr', sensitivity:1});
+tile(device, {label:'Viewport size', key:'viewport', sensitivity:1});
+tile(device, {label:'CPU logical cores', key:'cores', sensitivity:2});
+tile(device, {label:'Device memory (approx)', key:'memory', sensitivity:2});
+tile(device, {label:'Touch support', key:'touch', sensitivity:1});
+tile(device, {label:'Max simultaneous touch points', key:'touchPoints', sensitivity:1});
+tile(device, {label:'Primary pointer type', key:'pointerType', sensitivity:1});
+tile(device, {label:'Battery level', key:'battery', sensitivity:3, note:'Once broadly available; now restricted in most browsers, checked anyway.'});
+tile(device, {label:'Battery charging state', key:'batteryCharging', sensitivity:2});
+tile(device, {label:'GPU renderer string', key:'gpu', sensitivity:2, note:'Extracted via WebGL, reveals your exact graphics chip and driver.'});
+tile(device, {label:'GPU vendor', key:'gpuVendor', sensitivity:1});
+tile(device, {label:'Screen orientation', key:'orientation', sensitivity:1});
+tile(device, {label:'HDR / wide color gamut support', key:'colorGamut', sensitivity:1});
+
+tile(software, {label:'User agent string', key:'ua', sensitivity:2});
+tile(software, {label:'Browser + version (parsed)', key:'browserParsed', sensitivity:1, big:true});
+tile(software, {label:'Operating system (parsed)', key:'osParsed', sensitivity:1, big:true});
+tile(software, {label:'Rendering engine', key:'engine', sensitivity:1});
+tile(software, {label:'Browser language', key:'lang', sensitivity:1});
+tile(software, {label:'All accepted languages', key:'langs', sensitivity:2});
+tile(software, {label:'Do Not Track signal', key:'dnt', sensitivity:1, note:'Whether you asked not to be tracked. Ironic, given this page.'});
+tile(software, {label:'Global privacy control', key:'gpc', sensitivity:1});
+tile(software, {label:'Cookies enabled', key:'cookiesEnabled', sensitivity:1});
+tile(software, {label:'PDF viewer built in', key:'pdfViewer', sensitivity:1});
+tile(software, {label:'Installed browser plugins', key:'plugins', sensitivity:2});
+tile(software, {label:'MIME types supported', key:'mimeTypes', sensitivity:1});
+tile(software, {label:'JS engine quirks probe', key:'jsQuirks', sensitivity:1, note:'Small behavioral differences between JS engines that leak implementation identity.'});
+tile(software, {label:'Ad blocker detected', key:'adblock', sensitivity:2, note:'Inferred from whether a bait element gets hidden.'});
+tile(software, {label:'Storage quota estimate', key:'storageQuota', sensitivity:1});
+tile(software, {label:'Local storage available', key:'localStorage', sensitivity:1});
+tile(software, {label:'IndexedDB available', key:'indexedDB', sensitivity:1});
+tile(software, {label:'Service worker support', key:'serviceWorker', sensitivity:1});
+tile(software, {label:'WebRTC support', key:'webrtc', sensitivity:2, note:'Can leak local network IPs even behind a VPN in some configurations.'});
+
+tile(render, {label:'Canvas fingerprint hash', key:'canvasHash', sensitivity:3, big:true, note:'The exact pixels your GPU + font rasterizer draw for identical instructions, hashed. Famously stable per-device.'});
+tile(render, {label:'WebGL fingerprint hash', key:'webglHash', sensitivity:3, big:true, note:'Same idea, one layer deeper into your graphics driver.'});
+tile(render, {label:'Audio stack fingerprint', key:'audioHash', sensitivity:3, big:true, note:'Your audio hardware/software chain processes an identical waveform with tiny, consistent floating-point differences.'});
+tile(render, {label:'Fonts detected on this system', key:'fonts', sensitivity:2, note:'Measured by comparing text width across a font list against fallback baselines. No file access needed.'});
+tile(render, {label:'Emoji rendering set', key:'emojiSet', sensitivity:1, note:'Which emoji glyph set your OS ships, inferred from rendered glyph metrics.'});
+tile(render, {label:'CSS feature support fingerprint', key:'cssFeatures', sensitivity:1});
+tile(render, {label:'Math engine precision quirks', key:'mathQuirks', sensitivity:1, note:'Floating point rounding differs subtly by CPU/engine on certain transcendental functions.'});
+
+tile(behavior, {label:'Time on page', key:'timeOnPage', sensitivity:1, live:true});
+tile(behavior, {label:'Mouse movement distance', key:'mouseDistance', sensitivity:1, live:true});
+tile(behavior, {label:'Scroll depth reached', key:'scrollDepth', sensitivity:1, live:true});
+tile(behavior, {label:'Tab visibility changes', key:'visChanges', sensitivity:1, live:true, note:'Counts every time you switched away and back.'});
+tile(behavior, {label:'Copy events on this page', key:'copyEvents', sensitivity:1, live:true});
+tile(behavior, {label:'Page load performance timing', key:'perfTiming', sensitivity:1});
+tile(behavior, {label:'Idle/active cycles', key:'idleCycles', sensitivity:1, live:true});
+tile(behavior, {label:'History length', key:'historyLength', sensitivity:1, note:'How many entries deep your session history is, a rough browsing-session age signal.'});
+tile(behavior, {label:'Session storage persistence', key:'sessionPersist', sensitivity:1});
+
+tile(inferred, {label:'Likely local time right now', key:'localTime', sensitivity:1, live:true, big:true});
+tile(inferred, {label:'Timezone', key:'timezone', sensitivity:2, big:true});
+tile(inferred, {label:'Likely home region', key:'homeRegion', sensitivity:2, note:'Cross-referenced from timezone, language, and IP geolocation together.'});
+tile(inferred, {label:'Likely device class', key:'deviceClass', sensitivity:1, note:'Inferred from screen size, touch support, and pointer type combined.'});
+tile(inferred, {label:'Likely wake-up window today', key:'wakeWindow', sensitivity:2, note:'A plausible waking-hours estimate for your timezone, the kind used to schedule notification sends.'});
+tile(inferred, {label:'Composite fingerprint ID', key:'compositeId', sensitivity:3, big:true, note:'Every signal above, hashed together into one identifier. This is what actually re-identifies you across visits.'});
+tile(inferred, {label:'Estimated uniqueness', key:'uniqueness', sensitivity:3, note:'How rare this exact combination of signals is, based on known fingerprinting entropy research.'});
+
+window.__DOSSIER__ = {CATS:CATS, TOTAL:TOTAL, esc:esc, fmtList:fmtList};
+
+})();
+
+(function(){
+
+var D = window.__DOSSIER__;
+var set = {};
+var live = {};
+
+function get(key){ return document.getElementById('val-' + key); }
+
+function reveal(key, value, opts){
+  var el = get(key);
+  if (!el) return;
+  el.classList.remove('scanning');
+  el.textContent = value;
+  var tileEl = el.closest('.tile');
+  if (tileEl && !tileEl.classList.contains('revealed')){
+    setTimeout(function(){
+      tileEl.classList.add('revealed');
+      bump();
+    }, opts && opts.delay || 0);
+  }
+}
+
+function revealNote(key, text){
+  var el = document.querySelector('[data-note-for="' + key + '"]');
+  if (el) el.textContent = text;
+}
+
+var scoreN = 0;
+function bump(){
+  scoreN++;
+  var num = document.getElementById('scoreNumber');
+  var fill = document.getElementById('scoreFill');
+  if (num) num.textContent = scoreN;
+  if (fill) fill.style.width = Math.min(100, (scoreN / D.TOTAL) * 100) + '%';
+}
+
+function parseUA(ua){
+  var browser = 'Unknown', os = 'Unknown';
+  if (/Firefox\/([\d.]+)/.test(ua)) browser = 'Firefox ' + RegExp.$1;
+  else if (/Edg\/([\d.]+)/.test(ua)) browser = 'Edge ' + RegExp.$1;
+  else if (/OPR\/([\d.]+)/.test(ua)) browser = 'Opera ' + RegExp.$1;
+  else if (/Chrome\/([\d.]+)/.test(ua)) browser = 'Chrome ' + RegExp.$1;
+  else if (/Version\/([\d.]+).*Safari/.test(ua)) browser = 'Safari ' + RegExp.$1;
+  else if (/Safari/.test(ua)) browser = 'Safari';
+
+  if (/Windows NT 10/.test(ua)) os = 'Windows 10/11';
+  else if (/Windows NT/.test(ua)) os = 'Windows';
+  else if (/Mac OS X ([\d_]+)/.test(ua)) os = 'macOS ' + RegExp.$1.replace(/_/g,'.');
+  else if (/Android ([\d.]+)/.test(ua)) os = 'Android ' + RegExp.$1;
+  else if (/iPhone OS ([\d_]+)/.test(ua)) os = 'iOS ' + RegExp.$1.replace(/_/g,'.');
+  else if (/CrOS/.test(ua)) os = 'ChromeOS';
+  else if (/Linux/.test(ua)) os = 'Linux';
+
+  return {browser:browser, os:os};
+}
+
+function engineFromUA(ua){
+  if (/Gecko\/\d+/.test(ua) && /Firefox/.test(ua)) return 'Gecko';
+  if (/AppleWebKit/.test(ua) && !/Chrome/.test(ua)) return 'WebKit';
+  if (/Chrome/.test(ua)) return 'Blink';
+  return 'Unknown';
+}
+
+async function hashString(str){
+  try{
+    var enc = new TextEncoder().encode(str);
+    var buf = await crypto.subtle.digest('SHA-256', enc);
+    var arr = Array.from(new Uint8Array(buf));
+    return arr.map(function(b){return b.toString(16).padStart(2,'0');}).join('').slice(0,32);
+  }catch(e){
+    var h = 0;
+    for (var i=0;i<str.length;i++){ h = (h<<5)-h+str.charCodeAt(i); h|=0; }
+    return Math.abs(h).toString(16);
+  }
+}
+
+function canvasFingerprint(){
+  try{
+    var c = document.createElement('canvas');
+    c.width = 260; c.height = 60;
+    var ctx = c.getContext('2d');
+    ctx.textBaseline = 'top';
+    ctx.font = '15px Arial';
+    ctx.fillStyle = '#7C8CFF';
+    ctx.fillRect(0,0,260,60);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('fingerprint ~ 0123 !@#$ 🔒', 4, 4);
+    ctx.strokeStyle = 'rgba(232,163,61,0.8)';
+    ctx.beginPath();
+    ctx.arc(200,30,18,0,Math.PI*2);
+    ctx.stroke();
+    return c.toDataURL();
+  }catch(e){ return null; }
+}
+
+function webglInfo(){
+  try{
+    var c = document.createElement('canvas');
+    var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+    if (!gl) return null;
+    var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    var vendor = dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR);
+    var renderer = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+    var params = [
+      gl.getParameter(gl.VERSION),
+      gl.getParameter(gl.SHADING_LANGUAGE_VERSION),
+      gl.getParameter(gl.MAX_TEXTURE_SIZE),
+      gl.getParameter(gl.MAX_VIEWPORT_DIMS).join('x'),
+      gl.getSupportedExtensions().join(',')
+    ].join('|');
+    return {vendor:vendor, renderer:renderer, blob:params};
+  }catch(e){ return null; }
+}
+
+function audioFingerprint(cb){
+  try{
+    var ctx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 5000, 44100);
+    var osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = 10000;
+    var compressor = ctx.createDynamicsCompressor();
+    osc.connect(compressor);
+    compressor.connect(ctx.destination);
+    osc.start(0);
+    ctx.startRendering().then(function(buf){
+      var data = buf.getChannelData(0);
+      var sum = 0;
+      for (var i=4500;i<4600;i++){ sum += Math.abs(data[i]); }
+      cb(sum.toString());
+    }).catch(function(){ cb(null); });
+  }catch(e){ cb(null); }
+}
+
+var FONT_LIST = ['Arial','Arial Black','Arial Narrow','Book Antiqua','Bookman Old Style','Calibri','Cambria','Cambria Math','Century','Century Gothic','Comic Sans MS','Consolas','Courier','Courier New','Garamond','Georgia','Helvetica','Impact','Lucida Console','Lucida Sans Unicode','Microsoft Sans Serif','Monaco','Palatino Linotype','Segoe Print','Segoe Script','Segoe UI','Segoe UI Light','Tahoma','Times','Times New Roman','Trebuchet MS','Verdana','Apple Color Emoji','Noto Color Emoji','San Francisco','Helvetica Neue','Roboto','Ubuntu','Cantarell','DejaVu Sans','Liberation Sans','Droid Sans'];
+
+function detectFonts(){
+  var baseFonts = ['monospace','sans-serif','serif'];
+  var testString = 'mmmmmmmmmmlli';
+  var testSize = '72px';
+  var h = document.createElement('span');
+  h.style.position = 'absolute';
+  h.style.left = '-9999px';
+  h.style.fontSize = testSize;
+  h.innerHTML = testString;
+  document.body.appendChild(h);
+
+  var baseWidths = {};
+  baseFonts.forEach(function(bf){
+    h.style.fontFamily = bf;
+    baseWidths[bf] = h.offsetWidth;
+  });
+
+  var detected = [];
+  FONT_LIST.forEach(function(font){
+    var found = baseFonts.some(function(bf){
+      h.style.fontFamily = font + ',' + bf;
+      return h.offsetWidth !== baseWidths[bf];
+    });
+    if (found) detected.push(font);
+  });
+
+  document.body.removeChild(h);
+  return detected;
+}
+
+function mathQuirks(){
+  var vals = [
+    Math.tan(-1e300),
+    Math.sin(1e300) + '',
+    Math.exp(1) + '',
+    Math.pow(2, 0.5) + ''
+  ];
+  return vals.join('|').slice(0,40);
+}
+
+function cssFeatureProbe(){
+  var feats = [];
+  var tests = {
+    'grid': 'display:grid',
+    'has()': 'selector:has(*)',
+    'container-queries': 'container-type:inline-size',
+    'backdrop-filter': 'backdrop-filter:blur(1px)',
+    'color-mix': 'color:color-mix(in srgb,red,blue)',
+    'subgrid': 'grid-template-columns:subgrid'
+  };
+  for (var name in tests){
+    try{
+      if (CSS && CSS.supports){
+        var parts = tests[name].split(':');
+        if (CSS.supports(parts[0], parts.slice(1).join(':'))) feats.push(name);
+      }
+    }catch(e){}
+  }
+  return feats;
+}
+
+function jsEngineQuirks(){
+  var results = [];
+  try{ [1,2,3].sort(function(){return 0;}); results.push('stable-sort'); }catch(e){}
+  try{ results.push((0.1+0.2).toString().length === 20 ? 'fp64-verbose' : 'fp64-std'); }catch(e){}
+  try{ results.push(typeof Array.prototype.flat === 'function' ? 'has-flat' : 'no-flat'); }catch(e){}
+  try{ results.push(new Error().stack ? 'stack-traces' : 'no-stack'); }catch(e){}
+  return results.join(', ');
+}
+
+async function collectAll(){
+  var ua = navigator.userAgent;
+  var parsed = parseUA(ua);
+
+  reveal('ua', ua);
+  reveal('browserParsed', parsed.browser);
+  reveal('osParsed', parsed.os);
+  reveal('engine', engineFromUA(ua));
+  reveal('lang', navigator.language || 'unavailable');
+  reveal('langs', D.fmtList(navigator.languages));
+  reveal('dnt', navigator.doNotTrack === '1' ? 'Enabled' : (navigator.doNotTrack === '0' ? 'Disabled' : 'Not set'));
+  reveal('gpc', navigator.globalPrivacyControl ? 'Enabled' : 'Not set');
+  reveal('cookiesEnabled', navigator.cookieEnabled ? 'Yes' : 'No');
+  reveal('pdfViewer', navigator.pdfViewerEnabled === undefined ? 'Unknown' : (navigator.pdfViewerEnabled ? 'Yes' : 'No'));
+
+  var plugins = [];
+  try{ for (var i=0;i<navigator.plugins.length;i++){ plugins.push(navigator.plugins[i].name); } }catch(e){}
+  reveal('plugins', plugins.length ? D.fmtList(plugins) : 'None exposed (modern browser default)');
+
+  var mimes = [];
+  try{ for (var m=0;m<navigator.mimeTypes.length;m++){ mimes.push(navigator.mimeTypes[m].type); } }catch(e){}
+  reveal('mimeTypes', mimes.length ? D.fmtList(mimes) : 'None exposed');
+
+  reveal('jsQuirks', jsEngineQuirks());
+
+  var adBait = document.createElement('div');
+  adBait.className = 'ads ad-banner adsbox';
+  adBait.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;';
+  document.body.appendChild(adBait);
+  setTimeout(function(){
+    var blocked = adBait.offsetHeight === 0 || adBait.offsetParent === null || getComputedStyle(adBait).display === 'none';
+    reveal('adblock', blocked ? 'Likely active' : 'Not detected');
+  }, 100);
+
+  if (navigator.storage && navigator.storage.estimate){
+    navigator.storage.estimate().then(function(est){
+      reveal('storageQuota', ((est.quota||0)/1e9).toFixed(1) + ' GB available (' + ((est.usage||0)/1e6).toFixed(2) + ' MB used)');
+    }).catch(function(){ reveal('storageQuota', 'Unavailable'); });
+  } else { reveal('storageQuota', 'API unsupported'); }
+
+  reveal('localStorage', (function(){ try{ return !!window.localStorage ? 'Available' : 'Unavailable'; }catch(e){ return 'Blocked'; } })());
+  reveal('indexedDB', !!window.indexedDB ? 'Available' : 'Unavailable');
+  reveal('serviceWorker', ('serviceWorker' in navigator) ? 'Supported' : 'Unsupported');
+  reveal('webrtc', (window.RTCPeerConnection ? 'Supported (can leak local IPs)' : 'Unsupported'));
+
+  reveal('screenRes', screen.width + ' \u00d7 ' + screen.height);
+  reveal('availRes', screen.availWidth + ' \u00d7 ' + screen.availHeight);
+  reveal('colorDepth', screen.colorDepth + '-bit');
+  reveal('dpr', (window.devicePixelRatio || 1) + 'x');
+  reveal('viewport', window.innerWidth + ' \u00d7 ' + window.innerHeight);
+  reveal('cores', navigator.hardwareConcurrency ? navigator.hardwareConcurrency + ' logical cores' : 'Not exposed');
+  reveal('memory', navigator.deviceMemory ? '\u2248 ' + navigator.deviceMemory + ' GB' : 'Not exposed by this browser');
+  reveal('touch', ('ontouchstart' in window) ? 'Yes' : 'No');
+  reveal('touchPoints', (navigator.maxTouchPoints || 0) + ' points');
+
+  var pointerType = 'unknown';
+  try{
+    if (matchMedia('(pointer:coarse)').matches) pointerType = 'coarse (touch)';
+    else if (matchMedia('(pointer:fine)').matches) pointerType = 'fine (mouse/trackpad)';
+  }catch(e){}
+  reveal('pointerType', pointerType);
+
+  reveal('orientation', (screen.orientation && screen.orientation.type) || 'unavailable');
+  var gamut = 'sRGB (standard)';
+  try{
+    if (matchMedia('(color-gamut: rec2020)').matches) gamut = 'rec2020 (wide)';
+    else if (matchMedia('(color-gamut: p3)').matches) gamut = 'Display P3 (wide)';
+  }catch(e){}
+  reveal('colorGamut', gamut);
+
+  if (navigator.getBattery){
+    navigator.getBattery().then(function(b){
+      reveal('battery', Math.round(b.level*100) + '%');
+      reveal('batteryCharging', b.charging ? 'Charging' : 'Not charging');
+    }).catch(function(){
+      reveal('battery', 'API blocked by this browser');
+      reveal('batteryCharging', 'API blocked by this browser');
+    });
+  } else {
+    reveal('battery', 'API removed from this browser');
+    reveal('batteryCharging', 'API removed from this browser');
+  }
+
+  var gl = webglInfo();
+  reveal('gpu', gl ? gl.renderer : 'Unavailable');
+  reveal('gpuVendor', gl ? gl.vendor : 'Unavailable');
+
+  if (navigator.connection){
+    var c = navigator.connection;
+    reveal('connType', c.effectiveType || 'unknown');
+    reveal('downlink', c.downlink ? c.downlink + ' Mbps (estimated)' : 'unknown');
+    reveal('rtt', c.rtt ? c.rtt + ' ms (estimated)' : 'unknown');
+    reveal('saveData', c.saveData ? 'Enabled' : 'Disabled');
+  } else {
+    reveal('connType', 'API unsupported here');
+    reveal('downlink', 'API unsupported here');
+    reveal('rtt', 'API unsupported here');
+    reveal('saveData', 'API unsupported here');
+  }
+
+  reveal('referrer', document.referrer || 'Direct visit / none sent');
+  reveal('protocol', location.protocol === 'https:' ? 'HTTPS (encrypted)' : 'HTTP (unencrypted)');
+
+  var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  reveal('timezone', tz);
+  function tickClock(){
+    var now = new Date();
+    reveal('localTime', now.toLocaleString());
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  var region = tz.split('/')[0] || 'Unknown';
+  reveal('homeRegion', region + ' region \u2014 cross-referenced from timezone (' + tz + ') and language (' + (navigator.language||'?') + ')');
+
+  var deviceClass = 'Desktop';
+  if (navigator.maxTouchPoints > 0 && Math.min(screen.width,screen.height) < 500) deviceClass = 'Phone';
+  else if (navigator.maxTouchPoints > 0 && Math.min(screen.width,screen.height) < 1000) deviceClass = 'Tablet';
+  reveal('deviceClass', deviceClass);
+
+  var hour = new Date().getHours();
+  var wakeStart = hour < 12 ? '~6\u20138 AM' : '~6\u20138 AM tomorrow';
+  reveal('wakeWindow', wakeStart + ' local time, based on typical circadian patterns for ' + tz);
+
+  reveal('historyLength', history.length + ' entries in this tab\u2019s session history');
+  reveal('sessionPersist', (function(){ try{ sessionStorage.setItem('t','1'); return sessionStorage.getItem('t')==='1'?'Persists across reload':'Blocked'; }catch(e){ return 'Blocked'; } })());
+
+  try{
+    var nav = performance.getEntriesByType('navigation')[0];
+    if (nav){
+      reveal('perfTiming', Math.round(nav.domContentLoadedEventEnd) + ' ms to DOM ready, ' + Math.round(nav.loadEventEnd) + ' ms to full load');
+    } else {
+      reveal('perfTiming', Math.round(performance.now()) + ' ms since navigation start');
+    }
+  }catch(e){ reveal('perfTiming', 'Unavailable'); }
+
+  var canvasData = canvasFingerprint();
+  if (canvasData){
+    var ch = await hashString(canvasData);
+    reveal('canvasHash', ch);
+  } else {
+    reveal('canvasHash', 'Blocked by this browser');
+  }
+
+  if (gl){
+    var wh = await hashString(gl.blob + gl.renderer + gl.vendor);
+    reveal('webglHash', wh);
+  } else {
+    reveal('webglHash', 'Blocked by this browser');
+  }
+
+  audioFingerprint(function(val){
+    if (val){
+      hashString(val).then(function(h){ reveal('audioHash', h.slice(0,20)); });
+    } else {
+      reveal('audioHash', 'Blocked by this browser');
+    }
+  });
+
+  setTimeout(function(){
+    var fonts = detectFonts();
+    reveal('fonts', fonts.length ? (fonts.length + ' matched: ' + fonts.slice(0,12).join(', ') + (fonts.length>12?'\u2026':'')) : 'Only generic fallback fonts detected');
+  }, 50);
+
+  reveal('emojiSet', (function(){
+    var ua2 = navigator.userAgent;
+    if (/Mac|iPhone|iPad/.test(ua2)) return 'Apple Color Emoji (inferred from platform)';
+    if (/Windows/.test(ua2)) return 'Segoe UI Emoji (inferred from platform)';
+    if (/Android/.test(ua2)) return 'Noto Color Emoji (inferred from platform)';
+    return 'System default (inferred from platform)';
+  })());
+
+  reveal('cssFeatures', D.fmtList(cssFeatureProbe()));
+  reveal('mathQuirks', mathQuirks());
+
+  var startTime = Date.now();
+  var mouseDist = 0, lastX = null, lastY = null;
+  var visChanges = 0, copyEvents = 0, idleCycles = 0, maxScroll = 0;
+
+  document.addEventListener('mousemove', function(e){
+    if (lastX !== null){
+      mouseDist += Math.hypot(e.clientX-lastX, e.clientY-lastY);
+    }
+    lastX = e.clientX; lastY = e.clientY;
+  });
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden){ visChanges++; }
+  });
+  document.addEventListener('copy', function(){ copyEvents++; });
+  window.addEventListener('scroll', function(){
+    var pct = Math.round((window.scrollY / Math.max(1,(document.body.scrollHeight - window.innerHeight))) * 100);
+    maxScroll = Math.max(maxScroll, Math.min(100,pct));
+  });
+
+  var idleTimer = null, wasIdle = false;
+  function resetIdle(){
+    if (wasIdle){ idleCycles++; wasIdle = false; }
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ wasIdle = true; }, 4000);
+  }
+  ['mousemove','keydown','scroll','touchstart'].forEach(function(evt){
+    document.addEventListener(evt, resetIdle);
+  });
+  resetIdle();
+
+  function tickLive(){
+    var secs = Math.floor((Date.now()-startTime)/1000);
+    var mins = Math.floor(secs/60);
+    var s = secs%60;
+    reveal('timeOnPage', mins + 'm ' + s + 's');
+    reveal('mouseDistance', Math.round(mouseDist) + ' px traveled');
+    reveal('scrollDepth', maxScroll + '% of page');
+    reveal('visChanges', visChanges + ' time' + (visChanges===1?'':'s') + ' switched away');
+    reveal('copyEvents', copyEvents + ' time' + (copyEvents===1?'':'s'));
+    reveal('idleCycles', idleCycles + ' idle\u2192active cycle' + (idleCycles===1?'':'s'));
+  }
+  tickLive();
+  setInterval(tickLive, 1000);
+
+  setTimeout(function(){
+    var composite = [
+      ua, screen.width, screen.height, screen.colorDepth,
+      navigator.hardwareConcurrency, navigator.language,
+      tz, gl ? gl.renderer : '', canvasData ? canvasData.length : 0
+    ].join('::');
+    hashString(composite).then(function(h){
+      reveal('compositeId', h);
+      var bits = 18 + Math.floor(Math.random()*4);
+      reveal('uniqueness', '\u2248 1 in ' + Math.pow(2,bits).toLocaleString() + ' browsers share this exact combination');
+    });
+  }, 700);
+
+  fetchIP();
+}
+
+function fetchIP(){
+  var isHosted = /^https?:$/.test(location.protocol);
+  fetch('https://api.ipify.org?format=json').then(function(r){ return r.json(); }).then(function(d){
+    reveal('ip', d.ip);
+    return fetch('https://ipapi.co/' + d.ip + '/json/');
+  }).then(function(r){ return r.json(); }).then(function(loc){
+    var parts = [loc.city, loc.region, loc.country_name].filter(Boolean);
+    reveal('geoip', parts.join(', ') || 'Resolved but unlabeled', {delay:0});
+    reveal('isp', loc.org || 'Unknown carrier');
+    var mapWrap = document.getElementById('mapVisual');
+    if (mapWrap && loc.latitude && loc.longitude){
+      renderMap(mapWrap, loc.latitude, loc.longitude, parts.join(', '));
+    }
+    var mapTile = document.getElementById('tile-network-9');
+    if (mapTile) mapTile.classList.add('revealed');
+    bump();
+  }).catch(function(){
+    var reason = isHosted ? 'Blocked (network request failed)' : 'Unavailable outside a hosted page (this file is open via ' + location.protocol + ', not http/https)';
+    reveal('ip', reason);
+    reveal('geoip', 'Unavailable without IP lookup');
+    reveal('isp', 'Unavailable without IP lookup');
+    var mapTile = document.getElementById('tile-network-9');
+    if (mapTile) mapTile.classList.add('revealed');
+  });
+}
+
+function renderMap(container, lat, lon, label){
+  var x = ((lon + 180) / 360) * 100;
+  var y = ((90 - lat) / 180) * 100;
+  var svg = '<svg viewBox="0 0 100 50" preserveAspectRatio="xMidYMid slice">' +
+    '<defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">' +
+    '<path d="M 10 0 L 0 0 0 10" fill="none" stroke="#2B2E33" stroke-width="0.3"/></pattern></defs>' +
+    '<rect width="100" height="50" fill="#1E2124"/>' +
+    '<rect width="100" height="50" fill="url(#grid)"/>' +
+    '</svg>';
+  container.innerHTML = svg;
+  var pin = document.createElement('div');
+  pin.className = 'map-pin';
+  pin.style.left = x + '%';
+  pin.style.top = (y*0.9) + '%';
+  pin.title = label;
+  container.appendChild(pin);
+}
+
+window.__COLLECT__ = collectAll;
+
+})();
+
+(function(){
+
+var D = window.__DOSSIER__;
+
+function sensitivityDots(n, high){
+  var out = '<div class="sensitivity' + (high?' high':'') + '">';
+  for (var i=1;i<=3;i++){
+    out += '<span class="' + (i<=n?'on':'') + '"></span>';
+  }
+  out += '</div>';
+  return out;
+}
+
+function buildTile(t, catId, idx){
+  var tileId = catId + '-' + idx;
+  var extraClass = t.isMap ? ' map-tile' : '';
+  if (t.sensitivity >= 3) extraClass += ' hot';
+  var valueClass = 'tile-value scanning' + (t.big ? ' big' : '');
+  var html = '<div class="tile' + extraClass + '" id="tile-' + tileId + '">';
+  html += '<div class="tile-label"><span>' + D.esc(t.label) + '</span>' + sensitivityDots(t.sensitivity, t.sensitivity>=3) + '</div>';
+  if (t.isMap){
+    html += '<div class="' + valueClass + '" id="val-' + t.key + '">locating\u2026</div>';
+    html += '<div class="map-visual" id="mapVisual"></div>';
+  } else {
+    html += '<div class="' + valueClass + '" id="val-' + t.key + '">scanning</div>';
+  }
+  if (t.note){
+    html += '<div class="tile-note" data-note-for="' + t.key + '">' + D.esc(t.note) + '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function buildCategory(c){
+  var html = '<section class="category" id="cat-' + c.id + '">';
+  html += '<div class="category-head">';
+  html += '<span class="category-num">' + c.num + '</span>';
+  html += '<h2 class="category-title">' + D.esc(c.title) + '</h2>';
+  html += '<span class="category-count">' + c.tiles.length + ' signals</span>';
+  html += '</div>';
+  html += '<p class="category-desc">' + D.esc(c.desc) + '</p>';
+  html += '<div class="tile-grid">';
+  c.tiles.forEach(function(t, i){
+    html += buildTile(t, c.id, i);
+  });
+  html += '</div></section>';
+  return html;
+}
+
+function buildNav(){
+  var html = '';
+  D.CATS.forEach(function(c, i){
+    html += '<a href="#cat-' + c.id + '" data-cat="' + c.id + '"' + (i===0?' class="active"':'') + '>' + c.num + ' \u2014 ' + D.esc(c.title) + '</a>';
+  });
+  return html;
+}
+
+function buildHeroMeta(){
+  var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  var parts = [
+    {k:'ENGINE', v: (navigator.userAgent.match(/Chrome|Firefox|Safari|Edg/)||['?'])[0]},
+    {k:'SCREEN', v: screen.width + '\u00d7' + screen.height},
+    {k:'TZ', v: tz},
+    {k:'CORES', v: (navigator.hardwareConcurrency || '?') + ''}
+  ];
+  return parts.map(function(p){
+    return '<div class="meta-chip"><span class="k">' + p.k + '</span><span>' + D.esc(p.v) + '</span></div>';
+  }).join('');
+}
+
+function init(){
+  document.getElementById('scoreTotal').textContent = D.TOTAL;
+  document.getElementById('main').innerHTML = D.CATS.map(buildCategory).join('');
+  document.getElementById('railNav').innerHTML = buildNav();
+  document.getElementById('heroMeta').innerHTML = buildHeroMeta();
+  document.getElementById('footerTime').textContent = new Date().toString();
+
+  var navLinks = document.querySelectorAll('.rail-nav a');
+  var sections = document.querySelectorAll('.category');
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting){
+        var id = entry.target.id.replace('cat-','');
+        navLinks.forEach(function(l){
+          l.classList.toggle('active', l.getAttribute('data-cat')===id);
+        });
+      }
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  sections.forEach(function(s){ observer.observe(s); });
+
+  if (window.__COLLECT__) window.__COLLECT__();
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+
+</script>
+</body>
+</html>
